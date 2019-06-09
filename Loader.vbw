@@ -1,6 +1,0 @@
-clsCipher = 0, 0, 0, 0, C
-modAPI = 0, 0, 1340, 407, Z
-modEncrypt = 0, 0, 0, 0, C
-modStandard = 66, 66, 1111, 642, C
-modLoader = 44, 44, 1089, 620, C
-frmLoad = 0, 407, 1340, 814, , 22, 22, 405, 497, C
