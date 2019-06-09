@@ -84,8 +84,10 @@ Dim lstrEFNTA As String
         End
     End If
     
+    'Copy the latest static.ldr from the server folder
     FileCopy gstrStatic.strTrueLiveServerPath & gconstrStaticLdr, Trim$(App.Path) & "\" & gconstrStaticLdr
     
+    'Re-read static.ldr
     If UCase(Dir(Trim$(App.Path) & "\" & gconstrStaticLdr, vbNormal)) = UCase(gconstrStaticLdr) Then
         CheckStaticCipher
     End If
@@ -96,6 +98,7 @@ Dim lstrEFNTA As String
         
     lstrPassParam = "/X" '" /X"
     
+    'Setup paths
     If InStr(UCase(Command$), "/TEST") > 0 Then
         lstrErrorTrap = "Two"
         lstrPassParam = lstrPassParam & " /TEST"
@@ -119,16 +122,19 @@ Dim lstrEFNTA As String
     
     lstrErrorTrap = "Eight"
     
+    'Check for loader.log and clear
     If Dir(App.Path & "\Loader.log") <> "" Then
         Kill App.Path & "\Loader.log"
     End If
     
-    InstallOCX lstrServerSupportPath 'This routine installs new ocx files
+    'Installs any new ocx / dll files
+    InstallOCX lstrServerSupportPath
     
     lstrErrorTrap = "Nine"
     Me.Show
     DoEvents
     
+    'Update Minder.exe
     lblStatus.Caption = "Downloading."
     DoEvents
     lstrErrorTrap = "Ten"
@@ -138,6 +144,7 @@ Dim lstrEFNTA As String
     'CHK files are a copy of their server versions and used to tell if the server version has changed.
     'Obviously mdb file copies will change as they are used and can not be used to determine sever changes.
     
+    'Setup variables for local.mdb check
     If InStr(UCase(Command$), "/TEST") > 0 Then
         lstrErrorTrap = "Twelve"
         lstrSourceFile = lstrSourcePath & gstrStatic.strShortLocalTestingDBFile
@@ -162,6 +169,7 @@ Dim lstrEFNTA As String
         lstrErrorTrap = "TwentyOne"
     End If
 
+    'Ensure that chk is available
     If Trim$(Dir(lstrCheckFile)) = "" Then
         lstrErrorTrap = "TwentyOneOne"
         FileCopy lstrSourceFile, lstrCheckFile
@@ -169,21 +177,22 @@ Dim lstrEFNTA As String
     
     lstrErrorTrap = "TwentyOneTwo"
     
-    'get mdb if newer
+    'Get mdb if newer
     If FileCopyIfNewer(lstrSourceFile, lstrCheckFile) Then
         lstrErrorTrap = "TwentyTwo"
-        'always overwite localdb if new
+        'Always overwite localdb if new
         FileCopy lstrCheckFile, lstrDestinationFile
         lstrErrorTrap = "TwentyThree"
     ElseIf DateValue(Date) > DateValue(FileDateTime(lstrDestinationFile)) Then
         lstrErrorTrap = "TwentyFour"
-        'overwite localdb once per day
+        'Overwite localdb once per day
         FileCopy lstrCheckFile, lstrDestinationFile
         lstrErrorTrap = "TwentyFive"
     End If
     
     lstrErrorTrap = "TwentySix"
     
+    'Setup paths for Reps.mdb check
     If InStr(UCase(Command$), "/TEST") > 0 Then
         lstrErrorTrap = "TwentySeven"
         lstrSourceFile = lstrSourcePath & gstrStatic.strShortReportsTestingDBFile
@@ -215,15 +224,15 @@ Dim lstrEFNTA As String
     End If
     
     If UCase$(Right$(Trim$(gstrStatic.strShortReportsDBFile), 3)) = "MDB" Then
-        'get nwdb if newer
+        'Get reps.mdb if newer
         If FileCopyIfNewer(lstrSourceFile, lstrCheckFile) Then
             lstrErrorTrap = "ThirtySeven"
-            'always overwite localdb if new
+            'Always overwite localdb if new
             FileCopy lstrCheckFile, lstrDestinationFile
             lstrErrorTrap = "ThirtyEight"
         ElseIf DateValue(Date) > DateValue(FileDateTime(lstrDestinationFile)) Then
             lstrErrorTrap = "ThirtyNine"
-            'overwite localdb once per day
+            'Overwite localdb once per day
             FileCopy lstrCheckFile, lstrDestinationFile
             lstrErrorTrap = "Forty"
         End If
@@ -231,6 +240,7 @@ Dim lstrEFNTA As String
     
     Dim lbooParamaterUnknown As Boolean
 
+    'Setup paths for each program supplied from static.ldr
     If UCase(Dir(Trim$(App.Path) & "\" & gconstrStaticLdr, vbNormal)) = UCase(gconstrStaticLdr) Then
         lintProgCount = UBound(gstrStatic.strPrograms)
         lstrErrorTrap = "FortyOne"
@@ -250,6 +260,7 @@ Dim lstrEFNTA As String
         Next lintArrInc
     End If
     
+    'Stop loader from running an unknown program
     If lbooParamaterUnknown = True Then
         MsgBox "Your Loader Program has not been Setup correctly!", vbInformation, UCase(Command$)
         End
